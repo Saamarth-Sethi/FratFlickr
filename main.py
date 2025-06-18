@@ -21,7 +21,6 @@ class HandDetector:
         self.cooldownFrames = 15  # Number of frames to wait before detecting next flick
         
     def findHands(self, img, draw=True):
-        """Find hands in the image and optionally draw landmarks"""
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         self.results = self.hands.process(imgRGB)
         
@@ -33,7 +32,6 @@ class HandDetector:
         return img
     
     def findPosition(self, img, handNumber=0, draw=True):
-        """Get the position of hand landmarks (focusing on finger tips)"""
         landmarkList = []
         
         if self.results.multi_hand_landmarks:
@@ -55,7 +53,6 @@ class HandDetector:
         return landmarkList
     
     def detectFlick(self, landmarkList):
-        """Detect flicking motion based on index and middle finger movement"""
         # Decrease cooldown counter
         if self.flickCooldown > 0:
             self.flickCooldown -= 1
