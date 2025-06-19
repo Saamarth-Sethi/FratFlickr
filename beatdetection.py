@@ -26,18 +26,15 @@ dotRadius = 50
 beatDetected = False
 
 # Audio settings
-audioFile = "your_song.mp3"  # Replace with your audio file path
+audioFile = "your_song.mp3" 
 
 def loadAndAnalyzeAudio(filename):
-    """Load audio file and detect beats"""
     try:
         print("Loading audio file...")
-        # Load audio file with explicit duration limit to avoid memory issues
         y, sr = librosa.load(filename, duration=None)
         print(f"Audio loaded successfully. Sample rate: {sr}, Duration: {len(y)/sr:.2f} seconds")
         
         print("Analyzing beats...")
-        # Detect beat times with more robust parameters
         tempo, beatFrames = librosa.beat.beat_track(y=y, sr=sr, hop_length=512, start_bpm=120.0)
         beatTimes = librosa.frames_to_time(beatFrames, sr=sr, hop_length=512)
         
@@ -48,19 +45,12 @@ def loadAndAnalyzeAudio(filename):
         
     except FileNotFoundError:
         print(f"Error: Could not find file '{filename}'")
-        print("Please check that the file path is correct and the file exists.")
         return None, None
     except Exception as e:
         print(f"Error loading audio: {str(e)}")
-        print("This might be due to:")
-        print("1. Unsupported audio format")
-        print("2. Corrupted audio file") 
-        print("3. Library compatibility issues")
-        print("Try converting your file to WAV format or updating librosa/numpy")
         return None, None
 
 def playAudioWithBeats(beatTimes):
-    """Play audio and trigger beat detection"""
     global beatDetected
     
     # Initialize pygame mixer for audio playback
@@ -90,7 +80,6 @@ def playAudioWithBeats(beatTimes):
         print(f"Error playing audio: {e}")
 
 def drawScreen():
-    """Draw the screen with the beat indicator dot"""
     global beatDetected
     
     # Clear screen
@@ -114,7 +103,6 @@ def drawScreen():
     pygame.display.flip()
 
 def main():
-    """Main function to run the beat detection app"""
     global audioFile
     
     print("Beat Detection App")
@@ -142,16 +130,11 @@ def main():
     beatTimes, tempo = loadAndAnalyzeAudio(audioFile)
     
     if beatTimes is None:
-        print("\nTroubleshooting tips:")
-        print("1. Try converting your file to WAV format")
-        print("2. Update libraries: pip install --upgrade librosa numpy")
-        print("3. Make sure the file path has no special characters")
         return
     
     print("Starting beat detection app...")
     print("Press ESC or close window to exit")
     
-    # Start audio playback in a separate thread
     audioThread = threading.Thread(target=playAudioWithBeats, args=(beatTimes,))
     audioThread.daemon = True
     audioThread.start()
@@ -161,7 +144,6 @@ def main():
     running = True
     
     while running:
-        # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -169,13 +151,10 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     running = False
         
-        # Draw everything
         drawScreen()
         
-        # Control frame rate
         clock.tick(60)  # 60 FPS
     
-    # Cleanup
     pygame.mixer.music.stop()
     pygame.quit()
     sys.exit()
