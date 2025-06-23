@@ -24,6 +24,8 @@ dotX = screenWidth // 2
 dotY = screenHeight // 2
 dotRadius = 50
 beatDetected = False
+beatFlashTime = 0
+flashDuration = 0.1  # Flash duration in seconds
 
 # Audio settings
 audioFile = "your_song.mp3" 
@@ -51,9 +53,8 @@ def loadAndAnalyzeAudio(filename):
         return None, None
 
 def playAudioWithBeats(beatTimes):
-    global beatDetected
+    global beatDetected, beatFlashTime
     
-    # Initialize pygame mixer for audio playback
     pygame.mixer.init()
     
     try:
@@ -71,6 +72,7 @@ def playAudioWithBeats(beatTimes):
             # Check if we've reached the next beat time
             if beatIndex < len(beatTimes) and currentTime >= beatTimes[beatIndex]:
                 beatDetected = True
+                beatFlashTime = time.time()  # Record when the flash started
                 beatIndex += 1
                 print(f"Beat detected at {currentTime:.2f} seconds!")
             
@@ -80,16 +82,16 @@ def playAudioWithBeats(beatTimes):
         print(f"Error playing audio: {e}")
 
 def drawScreen():
-    global beatDetected
+    global beatDetected, beatFlashTime
     
     # Clear screen
     screen.fill(BLACK)
     
-    # Draw dot - green if beat detected, white otherwise
+    currentTime = time.time()
+    if beatDetected and (currentTime - beatFlashTime) > flashDuration:
+        beatDetected = False  # Stop flashing after duration
     if beatDetected:
         pygame.draw.circle(screen, GREEN, (dotX, dotY), dotRadius)
-        # Reset beat detection after drawing
-        beatDetected = False
     else:
         pygame.draw.circle(screen, WHITE, (dotX, dotY), dotRadius)
     
@@ -117,7 +119,6 @@ def main():
     # Check if file exists
     import os
     if not os.path.exists(audioFile):
-        # print(f"Error: File '{audioFile}' not found!")
         return
     
     try:
